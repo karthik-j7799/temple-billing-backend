@@ -18,6 +18,12 @@ enum ItemType {
   INVENTORY
 }
 
+enum BillStatus {
+  BOOKED
+  COMPLETED
+  CANCELLED
+}
+
 model User {
   id        String   @id @default(uuid())
   username  String   @unique
@@ -76,15 +82,25 @@ model Bill {
   nakshatraId    String?
   nakshatra      Nakshatra?  @relation(fields: [nakshatraId], references: [id])
 
+  poojaDate      DateTime
+
+  status         BillStatus  @default(BOOKED)
+
   totalAmount    Decimal     @db.Decimal(10, 2)
 
   items          BillItem[]
 
-  createdById    String?
-  createdBy      User?       @relation(fields: [createdById], references: [id])
+  createdById String
+  createdBy   User @relation(fields: [createdById], references: [id])
+
+  isEdited Boolean @default(false)
+
+  editedAt DateTime?
 
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
+
+  @@index([poojaDate])
 }
 
 model BillItem {

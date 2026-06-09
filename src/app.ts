@@ -4,6 +4,7 @@ import authRoutes from "./routes/auth.routes.js";
 import nakshatraRoutes from "./routes/nakshatra.routes.js";
 import poojaRoutes from "./routes/pooja.routes.js";
 import inventoryRoutes from "./routes/inventory.routes.js";
+import billRoutes from "./routes/bill.routes.js";
 
 const app = express();
 
@@ -21,5 +22,6 @@ app.use("/api/auth", authRoutes);
 app.use("/api/nakshatras", nakshatraRoutes);
 app.use("/api/poojas", poojaRoutes);
 app.use("/api/inventory", inventoryRoutes);
+app.use("/api/bills", billRoutes);
 
 export default app;
