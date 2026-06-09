@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  ADMIN
+  STAFF
+}
+
+enum ItemType {
+  POOJA
+  INVENTORY
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String
+  role      UserRole @default(STAFF)
+
+  bills     Bill[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Nakshatra {
+  id        String   @id @default(uuid())
+  name      String   @unique
+
+  bills     Bill[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Pooja {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  price     Decimal  @db.Decimal(10, 2)
+
+  isActive  Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Inventory {
+  id               String   @id @default(uuid())
+  itemName         String   @unique
+  price            Decimal  @db.Decimal(10, 2)
+
+  quantity         Int
+  lowStockQuantity Int      @default(10)
+
+  isActive         Boolean  @default(true)
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Bill {
+  id             String      @id @default(uuid())
+
+  receiptNumber  String      @unique
+
+  devoteeName    String
+  phoneNumber    String?
+
+  nakshatraId    String?
+  nakshatra      Nakshatra?  @relation(fields: [nakshatraId], references: [id])
+
+  totalAmount    Decimal     @db.Decimal(10, 2)
+
+  items          BillItem[]
+
+  createdById    String?
+  createdBy      User?       @relation(fields: [createdById], references: [id])
+
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+}
+
+model BillItem {
+  id           String   @id @default(uuid())
+
+  billId       String
+  bill         Bill     @relation(fields: [billId], references: [id], onDelete: Cascade)
+
+  itemType     ItemType
+
+  // Stores Pooja ID or Inventory ID
+  referenceId  String?
+
+  // Snapshot values at billing time
+  itemName     String
+
+  quantity     Int
+
+  unitPrice    Decimal  @db.Decimal(10, 2)
+
+  totalPrice   Decimal  @db.Decimal(10, 2)
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
